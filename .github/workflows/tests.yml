@@ -1,13 +1,8 @@
-name: Tests & Deployment
+name: Tests
 
 on:
   push:
-    branches:
-      - master
-      - '*.x'
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 permissions:
   contents: read
@@ -24,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.4
           extensions: dom, curl, libxml, mbstring, zip
           coverage: none
 
@@ -42,7 +37,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4, 8.5]
+        php: [8.4, 8.5]
 
     steps:
       - name: Checkout code
@@ -66,22 +61,3 @@ jobs:
 
       - name: Execute tests
         run: php artisan test
-
-  deploy:
-    name: Deploy Application
-    runs-on: ubuntu-latest
-    needs: [tests]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Run Deploy Script
-        run: |
-          echo "All checks and tests passed successfully! Starting deployment..."
-          # Place actual deployment commands here. E.g.:
-          # - Vapor deploy: vendor/bin/vapor deploy production
-          # - Forge trigger deployment webhook
-          # - SSH script execution
-          echo "Deployment successful!"
