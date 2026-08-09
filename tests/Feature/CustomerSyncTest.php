@@ -171,6 +171,47 @@ class CustomerSyncTest extends TestCase
         ]);
     }
 
+    public function test_sync_prevents_duplicate_external_ids_when_the_email_has_changed(): void
+    {
+        \App\Models\Customer::create([
+            'external_id' => 'dummyjson-1',
+            'first_name' => 'Existing',
+            'last_name' => 'Customer',
+            'email' => 'existing@example.com',
+        ]);
+
+        \Illuminate\Support\Facades\Http::fake([
+            'https://dummyjson.com/auth/login' => \Illuminate\Support\Facades\Http::response([
+                'accessToken' => 'fake-jwt-token',
+            ]),
+            'https://dummyjson.com/auth/users*' => \Illuminate\Support\Facades\Http::response([
+                'users' => [
+                    [
+                        'id' => 1,
+                        'firstName' => 'Incoming',
+                        'lastName' => 'Customer',
+                        'email' => 'incoming@example.com',
+                    ],
+                ],
+                'total' => 1,
+            ]),
+        ]);
+
+        $log = \App\Models\SyncLog::create(['status' => 'pending']);
+
+        app(\App\Services\CustomerSyncService::class)->sync($log);
+
+        $log->refresh();
+        $this->assertSame(0, $log->processed_records);
+        $this->assertSame(1, $log->failed_records);
+        $this->assertSame('Customer record already exists (duplicate).', $log->failures_log[0]['reason']);
+        $this->assertDatabaseCount('customers', 1);
+        $this->assertDatabaseHas('customers', [
+            'external_id' => 'dummyjson-1',
+            'email' => 'existing@example.com',
+        ]);
+    }
+
     public function test_sync_logs_failures_for_invalid_records(): void
     {
         // Fake the third-party API requests

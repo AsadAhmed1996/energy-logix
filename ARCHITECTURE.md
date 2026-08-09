@@ -142,31 +142,87 @@ All routes except landing/welcome page require authentication and email verifica
 
 ---
 
-## 4. Test Cases Document
+## 4. Test Cases
 
-The application testing suite contains 39 unit and feature tests. These tests can be run using `php artisan test`.
+The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the full suite with `php artisan test`, or run only the unit suite with `php artisan test --testsuite=Unit`.
 
-### Auth & Profile Feature Tests (`tests/Feature/Auth/` & `tests/Feature/ProfileTest.php`)
-*   **`AuthenticationTest`**: Tests login form rendering, user authentication with valid credentials, and denial of invalid attempts.
-*   **`EmailVerificationTest`**: Verifies redirection of unverified users and successful verification via signed URL.
-*   **`PasswordReset` / `PasswordUpdate`**: Tests request forgot password link, reset password, and user password update.
-*   **`RegistrationTest`**: Tests new user signup and creation in database.
-*   **`ProfileTest`**: Tests updating profile details, email verification resets, and account deletion.
+### Feature tests
 
-### Customer CRUD Feature Tests (`tests/Feature/CustomerCrudTest.php`)
-*   **`test_guests_cannot_access_customers_endpoints`**: Asserts guest users are redirected to login for index, store, update, and delete actions.
-*   **`test_authorized_user_can_list_customers`**: Checks that logged-in users see the list page and registered customers.
-*   **`test_authorized_user_can_create_customer`**: Asserts validated customer creation stores the record in database.
-*   **`test_create_customer_validates_required_fields`**: Asserts validation error session keys are present for missing fields.
-*   **`test_create_customer_validates_email_uniqueness`**: Checks email uniqueness validation rule.
-*   **`test_authorized_user_can_update_customer`**: Asserts customer modification updates columns.
-*   **`test_update_customer_ignores_own_email_uniqueness`**: Verifies that updating a user with their existing email does not throw a validation error.
-*   **`test_authorized_user_can_delete_customer`**: Asserts record is soft-deleted and removed from active list.
+#### Authentication (`tests/Feature/Auth/AuthenticationTest.php`)
+- `test_login_screen_can_be_rendered`
+- `test_users_can_authenticate_using_the_login_screen`
+- `test_users_can_not_authenticate_with_invalid_password`
+- `test_users_can_logout`
+- `test_login_fails_with_invalid_captcha`
 
-### Customer Sync Feature Tests (`tests/Feature/CustomerSyncTest.php`)
-*   **`test_guests_cannot_trigger_sync`**: Asserts guest users cannot trigger sync and get redirected.
-*   **`test_authorized_user_can_trigger_sync`**: Verifies triggering sync returns JSON structure and dispatches `SyncCustomersJob` to queue.
-*   **`test_sync_processes_and_stores_customers_successfully`**: Fakes API requests to `DummyJSON`, runs the `CustomerSyncService`, and asserts customer records are created with correct details.
-*   **`test_sync_prevents_duplicate_records`**: Asserts that running sync on duplicate emails updates the existing record rather than creating a new database record (count remains 1).
-*   **`test_sync_logs_failures_for_invalid_records`**: Fakes API response containing an invalid user (missing email) and asserts that the sync process registers it as a failure, increments `failed_records` count, and records the reason in `failures_log`.
-*   **`test_sync_soft_deleted_customer_is_failure_and_not_restored`**: Asserts that sync fakes fail for soft-deleted local customers rather than restoring them.
+#### Email verification (`tests/Feature/Auth/EmailVerificationTest.php`)
+- `test_email_verification_screen_can_be_rendered`
+- `test_email_can_be_verified`
+- `test_email_is_not_verified_with_invalid_hash`
+
+#### Password confirmation (`tests/Feature/Auth/PasswordConfirmationTest.php`)
+- `test_confirm_password_screen_can_be_rendered`
+- `test_password_can_be_confirmed`
+- `test_password_is_not_confirmed_with_invalid_password`
+
+#### Password reset (`tests/Feature/Auth/PasswordResetTest.php`)
+- `test_reset_password_link_screen_can_be_rendered`
+- `test_reset_password_link_can_be_requested`
+- `test_reset_password_screen_can_be_rendered`
+- `test_password_can_be_reset_with_valid_token`
+
+#### Password update (`tests/Feature/Auth/PasswordUpdateTest.php`)
+- `test_password_can_be_updated`
+- `test_correct_password_must_be_provided_to_update_password`
+
+#### Registration (`tests/Feature/Auth/RegistrationTest.php`)
+- `test_registration_screen_can_be_rendered`
+- `test_new_users_can_register`
+
+#### Customer CRUD (`tests/Feature/CustomerCrudTest.php`)
+- `test_guests_cannot_access_customers_endpoints`
+- `test_authorized_user_can_list_customers`
+- `test_authorized_user_can_access_create_page`
+- `test_authorized_user_can_access_edit_page`
+- `test_authorized_user_can_create_customer`
+- `test_create_customer_validates_required_fields`
+- `test_create_customer_validates_email_uniqueness`
+- `test_authorized_user_can_update_customer`
+- `test_update_customer_ignores_own_email_uniqueness`
+- `test_authorized_user_can_delete_customer`
+
+#### Customer sync (`tests/Feature/CustomerSyncTest.php`)
+- `test_guests_cannot_trigger_sync`
+- `test_authorized_user_can_trigger_sync`
+- `test_sync_processes_and_stores_customers_successfully`
+- `test_sync_prevents_duplicate_records` — rejects a matching email or external ID without altering the existing record.
+- `test_sync_prevents_duplicate_external_ids_when_the_email_has_changed` — rejects a matching external ID even when the incoming email is new.
+- `test_sync_logs_failures_for_invalid_records`
+- `test_sync_soft_deleted_customer_is_failure_and_not_restored`
+
+#### Dashboard (`tests/Feature/DashboardAccessTest.php`)
+- `test_authenticated_user_can_access_dashboard_at_root_url`
+
+#### Profile (`tests/Feature/ProfileTest.php`)
+- `test_profile_page_is_displayed`
+- `test_profile_information_can_be_updated`
+- `test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged`
+
+### Unit tests
+
+#### CAPTCHA rule (`tests/Unit/CaptchaTest.php`)
+- `test_it_skips_validation_when_captcha_is_disabled`
+- `test_it_accepts_the_expected_code_case_insensitively`
+- `test_it_accepts_a_code_from_the_captcha_pool`
+- `test_it_rejects_an_unknown_code`
+
+#### Customer model (`tests/Unit/CustomerTest.php`)
+- `test_it_formats_only_available_address_parts`
+- `test_it_exposes_the_customers_full_name`
+
+#### DummyJSON API service (`tests/Unit/DummyJsonApiServiceTest.php`)
+- `test_it_authenticates_with_configured_credentials`
+- `test_it_rejects_missing_credentials`
+- `test_it_rejects_a_successful_auth_response_without_a_token`
+- `test_it_fetches_a_user_batch_with_the_token_and_pagination`
+- `test_it_throws_when_fetching_users_fails`
