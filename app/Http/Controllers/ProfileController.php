@@ -15,7 +15,8 @@ class ProfileController extends Controller
 {
     public function __construct(
         protected ProfileService $profileService
-    ) {}
+    ) {
+    }
 
     /**
      * Display the user's profile form.

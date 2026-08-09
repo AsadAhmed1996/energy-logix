@@ -35,10 +35,10 @@ class CustomerService
         $sortOrder = $filters['sort_order'] ?? 'desc';
 
         $allowedSortFields = ['first_name', 'email', 'phone', 'status', 'created_at'];
-        if (!in_array($sortField, $allowedSortFields)) {
+        if (! in_array($sortField, $allowedSortFields)) {
             $sortField = 'created_at';
         }
-        
+
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
 
         return $query->orderBy($sortField, $sortOrder)->paginate($perPage)->withQueryString();

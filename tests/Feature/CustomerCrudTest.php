@@ -100,7 +100,7 @@ class CustomerCrudTest extends TestCase
 
         $response->assertSessionHasErrors([
             'first_name', 'last_name', 'email', 'phone', 'status',
-            'address_street', 'address_city', 'address_state', 'address_zip', 'address_country'
+            'address_street', 'address_city', 'address_state', 'address_zip', 'address_country',
         ]);
     }
 

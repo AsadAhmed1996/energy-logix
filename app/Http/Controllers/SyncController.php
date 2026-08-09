@@ -10,7 +10,8 @@ class SyncController extends Controller
 {
     public function __construct(
         protected CustomerSyncService $syncService
-    ) {}
+    ) {
+    }
 
     /**
      * Start the customer synchronization process.

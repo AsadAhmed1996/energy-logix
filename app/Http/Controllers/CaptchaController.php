@@ -9,7 +9,8 @@ class CaptchaController extends Controller
 {
     public function __construct(
         protected CaptchaService $captchaService
-    ) {}
+    ) {
+    }
 
     /**
      * Generate a new captcha, append to session pool, and return base64 image.

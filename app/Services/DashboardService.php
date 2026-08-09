@@ -42,10 +42,10 @@ class DashboardService
         $sortOrder = $filters['sort_order'] ?? 'desc';
 
         $allowedSortFields = ['started_at', 'completed_at', 'status', 'total_records', 'processed_records', 'failed_records'];
-        if (!in_array($sortField, $allowedSortFields)) {
+        if (! in_array($sortField, $allowedSortFields)) {
             $sortField = 'started_at';
         }
-        
+
         $sortOrder = in_array(strtolower($sortOrder), ['asc', 'desc']) ? $sortOrder : 'desc';
 
         return $query->orderBy($sortField, $sortOrder)->paginate($perPage)->withQueryString();

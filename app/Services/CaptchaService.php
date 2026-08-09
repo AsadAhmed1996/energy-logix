@@ -14,7 +14,7 @@ class CaptchaService
         $image = imagecreatetruecolor($width, $height);
 
         // Soft light gray background
-        $backgroundColor = imagecolorallocate($image, 245, 247, 250); 
+        $backgroundColor = imagecolorallocate($image, 245, 247, 250);
         imagefill($image, 0, 0, $backgroundColor);
 
         // Add noise (lines & dots)

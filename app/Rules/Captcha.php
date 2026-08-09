@@ -23,7 +23,7 @@ class Captcha implements ValidationRule
 
         $valueStr = strtolower((string) $value);
         $expectedStr = $expected ? strtolower((string) $expected) : null;
-        $poolStrs = array_map(fn($item) => strtolower((string) $item), $pool);
+        $poolStrs = array_map(fn ($item) => strtolower((string) $item), $pool);
 
         $isValid = ($expectedStr && $valueStr === $expectedStr) || in_array($valueStr, $poolStrs, true);
 

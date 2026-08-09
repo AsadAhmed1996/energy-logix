@@ -2,12 +2,10 @@
 
 namespace App\Services;
 
-use App\Exceptions\SyncAuthException;
-use App\Exceptions\SyncFetchException;
 use App\Exceptions\InvalidRecordException;
+use App\Jobs\SyncCustomersJob;
 use App\Models\Customer;
 use App\Models\SyncLog;
-use App\Jobs\SyncCustomersJob;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

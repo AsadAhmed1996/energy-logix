@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
 use App\Exceptions\SyncAuthException;
 use App\Exceptions\SyncFetchException;
+use Illuminate\Support\Facades\Http;
 
 class DummyJsonApiService
 {

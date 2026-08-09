@@ -14,8 +14,8 @@ use Inertia\Response;
 class CustomerController extends Controller
 {
     public function __construct(
-        protected CustomerService $customerService)
-    {
+        protected CustomerService $customerService
+    ) {
     }
 
     /**
@@ -25,8 +25,8 @@ class CustomerController extends Controller
     {
         $filters = $request->only(['search', 'status', 'per_page', 'sort_field', 'sort_order']);
         $perPage = (int) $request->input('per_page', 10);
-        
-        if (!in_array($perPage, [10, 25, 50, 100])) {
+
+        if (! in_array($perPage, [10, 25, 50, 100])) {
             $perPage = 10;
         }
 
@@ -101,7 +101,7 @@ class CustomerController extends Controller
 
         try {
             $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'User-Agent' => 'EnergyLogixEngine/2.4.1 (admin@energylogix-app.co.uk)'
+                'User-Agent' => 'EnergyLogixEngine/2.4.1 (admin@energylogix-app.co.uk)',
             ])
             ->timeout(5)
             ->get('https://nominatim.openstreetmap.org/search', [
@@ -109,7 +109,7 @@ class CustomerController extends Controller
                 'format' => 'json',
                 'addressdetails' => 1,
                 'limit' => 5,
-                'accept-language' => 'en'
+                'accept-language' => 'en',
             ]);
 
             if ($response->successful()) {
