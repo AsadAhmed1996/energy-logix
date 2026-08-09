@@ -197,6 +197,39 @@ class CustomerCrudTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
+    public function test_customer_listing_applies_search_status_and_name_sorting(): void
+    {
+        \App\Models\Customer::create([
+            'first_name' => 'Zed',
+            'last_name' => 'Customer',
+            'email' => 'zed.customer@example.com',
+            'status' => 'active',
+        ]);
+        \App\Models\Customer::create([
+            'first_name' => 'Alpha',
+            'last_name' => 'Customer',
+            'email' => 'alpha.customer@example.com',
+            'status' => 'active',
+        ]);
+        \App\Models\Customer::create([
+            'first_name' => 'Inactive',
+            'last_name' => 'Customer',
+            'email' => 'inactive.customer@example.com',
+            'status' => 'inactive',
+        ]);
+
+        $response = $this->actingAs($this->user)->get(route('customers.index', [
+            'search' => 'customer',
+            'status' => 'active',
+            'sort_field' => 'name',
+            'sort_order' => 'asc',
+        ]));
+
+        $response->assertOk()
+            ->assertSeeInOrder(['Alpha', 'Zed'])
+            ->assertDontSee('Inactive');
+    }
+
     public function test_authorized_user_can_delete_customer(): void
     {
         $customer = \App\Models\Customer::create([

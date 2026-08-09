@@ -22,6 +22,17 @@ class EmailVerificationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_unverified_users_can_request_a_new_verification_notification(): void
+    {
+        $user = User::factory()->unverified()->create();
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $response = $this->actingAs($user)->post(route('verification.send'));
+
+        $response->assertSessionHas('status', 'verification-link-sent');
+        \Illuminate\Support\Facades\Notification::assertSentTo($user, \Illuminate\Auth\Notifications\VerifyEmail::class);
+    }
+
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();

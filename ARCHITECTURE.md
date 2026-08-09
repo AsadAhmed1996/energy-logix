@@ -144,7 +144,7 @@ All routes except landing/welcome page require authentication and email verifica
 
 ## 4. Test Cases
 
-The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the full suite with `php artisan test`, or run only the unit suite with `php artisan test --testsuite=Unit`.
+The suite contains **57 tests**: 44 feature tests and 13 unit tests. Run the full suite with `php artisan test`, or run only the unit suite with `php artisan test --testsuite=Unit`.
 
 ### Feature tests
 
@@ -157,6 +157,7 @@ The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the ful
 
 #### Email verification (`tests/Feature/Auth/EmailVerificationTest.php`)
 - `test_email_verification_screen_can_be_rendered`
+- `test_unverified_users_can_request_a_new_verification_notification`
 - `test_email_can_be_verified`
 - `test_email_is_not_verified_with_invalid_hash`
 
@@ -190,10 +191,12 @@ The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the ful
 - `test_authorized_user_can_update_customer`
 - `test_update_customer_ignores_own_email_uniqueness`
 - `test_authorized_user_can_delete_customer`
+- `test_customer_listing_applies_search_status_and_name_sorting`
 
 #### Customer sync (`tests/Feature/CustomerSyncTest.php`)
 - `test_guests_cannot_trigger_sync`
 - `test_authorized_user_can_trigger_sync`
+- `test_sync_trigger_is_rejected_while_another_sync_is_running`
 - `test_sync_processes_and_stores_customers_successfully`
 - `test_sync_prevents_duplicate_records` — rejects a matching email or external ID without altering the existing record.
 - `test_sync_prevents_duplicate_external_ids_when_the_email_has_changed` — rejects a matching external ID even when the incoming email is new.
@@ -208,6 +211,9 @@ The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the ful
 - `test_profile_information_can_be_updated`
 - `test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged`
 
+#### CAPTCHA replenish (`tests/Feature/CaptchaReplenishTest.php`)
+- `test_it_returns_a_replenished_captcha_image`
+
 ### Unit tests
 
 #### CAPTCHA rule (`tests/Unit/CaptchaTest.php`)
@@ -215,6 +221,10 @@ The suite contains **51 tests**: 40 feature tests and 11 unit tests. Run the ful
 - `test_it_accepts_the_expected_code_case_insensitively`
 - `test_it_accepts_a_code_from_the_captcha_pool`
 - `test_it_rejects_an_unknown_code`
+
+#### CAPTCHA service (`tests/Unit/CaptchaServiceTest.php`)
+- `test_it_generates_images_and_persists_a_captcha_pool`
+- `test_it_keeps_only_the_ten_most_recent_captcha_codes`
 
 #### Customer model (`tests/Unit/CustomerTest.php`)
 - `test_it_formats_only_available_address_parts`

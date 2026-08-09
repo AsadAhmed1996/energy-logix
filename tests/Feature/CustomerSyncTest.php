@@ -47,6 +47,19 @@ class CustomerSyncTest extends TestCase
         ]);
     }
 
+    public function test_sync_trigger_is_rejected_while_another_sync_is_running(): void
+    {
+        \Illuminate\Support\Facades\Queue::fake();
+        $activeLog = \App\Models\SyncLog::create(['status' => 'running']);
+
+        $response = $this->actingAs($this->user)->postJson(route('sync.trigger'));
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', 'A synchronization process is already running.')
+            ->assertJsonPath('log.id', $activeLog->id);
+        \Illuminate\Support\Facades\Queue::assertNothingPushed();
+    }
+
     public function test_sync_processes_and_stores_customers_successfully(): void
     {
         // Fake the third-party API requests
